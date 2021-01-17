@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import { Animated, StyleSheet, View } from 'react-native';
+import { Animated, StyleSheet, View, TouchableOpacity, Vibration} from 'react-native';
 import SoundPlayer from 'react-native-sound-player'
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import randomColor from 'randomcolor'
 
 import {
   PanGestureHandler, State,
@@ -23,17 +25,27 @@ export class DraggableBox extends Component {
       ],
       { useNativeDriver: false }
     );
+
   }
 
   onHandlerStateEvent = e => {
     if(e.nativeEvent.oldState == State.ACTIVE) {
       Animated.timing(this._translateX, {toValue:0, duration: 250, useNativeDriver:true}).start()
       Animated.timing(this._translateY, {toValue:0, duration: 250, useNativeDriver:true}).start()
-      try {
-        SoundPlayer.playSoundFile('bubble', 'mp3')
-      } catch (e) {
-          console.log(`cannot play the sound file`, e)
+      this.props.setBackgroundColor()
+      if(this.props.isVibrate){
+        Vibration.vibrate()
       }
+
+
+      if(this.props.isMute) {
+        try {
+          SoundPlayer.playSoundFile('bubble', 'mp3')
+        } catch (e) {
+            console.log(`cannot play the sound file`, e)
+        }
+      }
+
     }
 
     
@@ -45,9 +57,13 @@ export class DraggableBox extends Component {
         onGestureEvent={this._onGestureEvent}
         onHandlerStateChange={this.onHandlerStateEvent}
         >
+
         <Animated.View
           style={[
             styles.box,
+            {
+              backgroundColor:this.props.circleColor
+            },
             {
               transform: [
                 { translateX: this._translateX },
@@ -62,18 +78,58 @@ export class DraggableBox extends Component {
   }
 }
 
+
+
 export default class Example extends Component {
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      setVolume : true,
+      setVibrate : true,
+      backgroundMainColor : randomColor(),
+      circleColor : randomColor()
+    }
+  }
+
+  muteVolume = () => {
+    this.setState({setVolume: !this.state.setVolume})
+  }
+
+  cancelVibrate = () => {
+    this.setState({setVibrate: !this.state.setVibrate})
+  }
+ 
+  setBackground = () => {
+    let random = randomColor()
+    this.setState({backgroundMainColor : random, circleColor:randomColor()})
+  }
+
   render() {
     return (
-      <View style={styles.scrollView}>
-        <DraggableBox />
+      <View style={[styles.mainContent, {backgroundColor:this.state.backgroundMainColor}]}>
+        
+        <View style={{position:"absolute", top:20, right:30, height:80, justifyContent:"space-between"}}>
+          <TouchableOpacity onPress={this.cancelVibrate}>
+            <Icon name="vibration" size={30} color={this.state.setVibrate ? "lightgray": "black"}/>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={this.muteVolume}>
+            <Icon name={this.state.setVolume ? "volume-up" : "volume-off"} size={30} color={this.state.setVolume ? "lightgray" : "black"} />
+          </TouchableOpacity>
+        </View>
+
+        <DraggableBox
+          circleColor = {this.state.circleColor}
+          setBackgroundColor={this.setBackground}
+          isVibrate={this.state.setVibrate}
+          isMute={this.state.setVolume}/>
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  scrollView: {
+  mainContent: {
     flex: 1,
     justifyContent:"center",
     alignItems:"center"
@@ -82,7 +138,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     alignSelf: 'center',
-    backgroundColor: 'plum',
+    //backgroundColor: randomColor(),
     borderRadius:100/2
   },
 });

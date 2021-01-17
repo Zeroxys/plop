@@ -3,17 +3,22 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
+    "start": "react-native start --reset-cache",
+    "clean": "cd android && ./gradlew clean && cd .. && react-native run-android",
+    "release": "cd android && ./gradlew bundleRelease && cd .. && react-native run-android --variant=release",
+    "cleanCache": "rm -rf ~/.gradle/caches/*",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "start": "react-native start",
     "test": "jest",
     "lint": "eslint ."
   },
   "dependencies": {
+    "randomcolor": "^0.6.2",
     "react": "16.13.1",
     "react-native": "0.63.4",
     "react-native-gesture-handler": "^1.9.0",
-    "react-native-sound-player": "^0.10.5"
+    "react-native-sound-player": "^0.10.5",
+    "react-native-vector-icons": "^7.1.0"
   },
   "devDependencies": {
     "@babel/core": "7.12.10",
