@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Animated, StyleSheet, View, TouchableOpacity, Vibration} from 'react-native';
+import { Animated, StyleSheet, View, TouchableOpacity, Vibration, Text} from 'react-native';
 import SoundPlayer from 'react-native-sound-player'
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import randomColor from 'randomcolor'
@@ -33,6 +33,7 @@ export class DraggableBox extends Component {
       Animated.timing(this._translateX, {toValue:0, duration: 250, useNativeDriver:true}).start()
       Animated.timing(this._translateY, {toValue:0, duration: 250, useNativeDriver:true}).start()
       this.props.setBackgroundColor()
+      this.props.setScore()
       if(this.props.isVibrate){
         Vibration.vibrate()
       }
@@ -88,7 +89,8 @@ export default class Example extends Component {
       setVolume : true,
       setVibrate : true,
       backgroundMainColor : randomColor(),
-      circleColor : randomColor()
+      circleColor : randomColor(),
+      score : 0
     }
   }
 
@@ -105,6 +107,10 @@ export default class Example extends Component {
     this.setState({backgroundMainColor : random, circleColor:randomColor()})
   }
 
+  setScore = () => {
+    this.setState({score : this.state.score + 1})
+  }
+
   render() {
     return (
       <View style={[styles.mainContent, {backgroundColor:this.state.backgroundMainColor}]}>
@@ -118,7 +124,14 @@ export default class Example extends Component {
           </TouchableOpacity>
         </View>
 
+
+        <View style={{position:"absolute", top:"7%"}}>
+            <Text style={{color:"lightgray", fontWeight:"bold", fontSize:20}}>{`Plop! Score: ${this.state.score}`}</Text>
+        </View>
+
+
         <DraggableBox
+          setScore = {this.setScore}
           circleColor = {this.state.circleColor}
           setBackgroundColor={this.setBackground}
           isVibrate={this.state.setVibrate}
