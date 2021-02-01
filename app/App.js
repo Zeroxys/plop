@@ -3,6 +3,7 @@ import { Animated, StyleSheet, View, TouchableOpacity, Vibration, Text} from 're
 import SoundPlayer from 'react-native-sound-player'
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import randomColor from 'randomcolor'
+import {version} from "../package.json"
 
 import {
   PanGestureHandler, State,
@@ -90,6 +91,7 @@ export default class Example extends Component {
       setVibrate : true,
       backgroundMainColor : randomColor(),
       circleColor : randomColor(),
+      disableRandomColor : false,
       score : 0
     }
   }
@@ -103,8 +105,10 @@ export default class Example extends Component {
   }
  
   setBackground = () => {
-    let random = randomColor()
-    this.setState({backgroundMainColor : random, circleColor:randomColor()})
+    if(!this.state.disableRandomColor){
+      let random = randomColor()
+      this.setState({backgroundMainColor : random, circleColor:randomColor()})
+    }    
   }
 
   setScore = () => {
@@ -122,6 +126,9 @@ export default class Example extends Component {
           <TouchableOpacity onPress={this.muteVolume}>
             <Icon name={this.state.setVolume ? "volume-up" : "volume-off"} size={30} color={this.state.setVolume ? "lightgray" : "black"} />
           </TouchableOpacity>
+          <TouchableOpacity onPress={() => this.setState({disableRandomColor:!this.state.disableRandomColor})} >
+            <Icon name={"color-lens"} size={30} color={!this.state.disableRandomColor ? "lightgray": "black"}></Icon>
+          </TouchableOpacity>
         </View>
 
 
@@ -136,6 +143,10 @@ export default class Example extends Component {
           setBackgroundColor={this.setBackground}
           isVibrate={this.state.setVibrate}
           isMute={this.state.setVolume}/>
+
+        <View style={{position:"absolute", bottom:0, left:10}}>
+          <View><Text style={{fontSize:10, fontWeight:"bold"}}>Version : {version}</Text></View>
+        </View>
       </View>
     );
   }
@@ -148,6 +159,7 @@ const styles = StyleSheet.create({
     alignItems:"center"
   },
   box: {
+    elevation:18,
     width: 100,
     height: 100,
     alignSelf: 'center',
